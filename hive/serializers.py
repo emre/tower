@@ -8,6 +8,7 @@ class AccountSerializer(serializers.ModelSerializer):
         model = Account
         fields = ('__all__')
 
+
 class BlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Block
@@ -21,6 +22,7 @@ class LightPostSerializer(serializers.ModelSerializer):
             'id', 'is_deleted', 'is_pinned',
             'is_muted', 'is_valid', 'promoted', 'parent', 'community'
         )
+
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:

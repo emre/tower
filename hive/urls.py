@@ -1,7 +1,8 @@
 from rest_framework import routers
 
 from .views import (
-    AccountViewSet, BlockViewSet, PostViewSet, PostCacheViewSet
+    AccountViewSet, BlockViewSet, PostViewSet, PostCacheViewSet,
+    ReblogViewSet
 )
 
 
