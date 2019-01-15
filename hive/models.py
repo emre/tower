@@ -46,7 +46,7 @@ class Block(models.Model):
 
 
 class Community(models.Model):
-    name = models.ForeignKey(Account, models.DO_NOTHING, db_column='name',
+    name = models.OneToOneField(Account, models.DO_NOTHING, db_column='name',
                              primary_key=True)
     title = models.CharField(max_length=32)
     about = models.CharField(max_length=255)
@@ -154,10 +154,9 @@ class PostTag(models.Model):
 
 class Post(models.Model):
     parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
-    author = models.ForeignKey(Account, models.DO_NOTHING, db_column='author', related_name="author")
+    author = models.CharField(max_length=255)
     permlink = models.CharField(max_length=255)
-    community = models.ForeignKey(Account, models.DO_NOTHING,
-                                  db_column='community')
+    community = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
     depth = models.SmallIntegerField()
     created_at = models.DateTimeField()
@@ -171,10 +170,11 @@ class Post(models.Model):
         managed = False
         db_table = 'hive_posts'
         unique_together = (('author', 'permlink'),)
+        ordering = ["-pk"]
 
 
 class PostCache(models.Model):
-    post_id = models.AutoField(primary_key=True)
+    post = models.ForeignKey(Post, primary_key=True, on_delete=models.DO_NOTHING)
     author = models.CharField(max_length=16)
     permlink = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
@@ -209,6 +209,7 @@ class PostCache(models.Model):
     class Meta:
         managed = False
         db_table = 'hive_posts_cache'
+        ordering = ['-post_id',]
 
 
 class Reblog(models.Model):
