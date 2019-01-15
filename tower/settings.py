@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'hive',
+    'rest_framework',
+    'django_filters',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -118,6 +122,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'hive.pagination.TowerPagination',
+    'PAGE_SIZE': 100,
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
 
 try:
     from .local_settings import *
