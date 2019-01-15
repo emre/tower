@@ -213,7 +213,7 @@ class PostCache(models.Model):
 
 
 class Reblog(models.Model):
-    account = models.ForeignKey(Account, models.DO_NOTHING, db_column='account')
+    account = models.CharField(max_length=255)
     post = models.ForeignKey(Post, models.DO_NOTHING)
     created_at = models.DateTimeField()
 
