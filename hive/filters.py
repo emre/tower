@@ -1,9 +1,29 @@
 from django_filters import rest_framework as filters
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from .models import Account
+from rest_framework.filters import OrderingFilter
+
+
+class TowerFilterBackend(DjangoFilterBackend):
+    def get_schema_fields(self, view):
+        if view.action not in ["list"]:
+            return []
+        return super().get_schema_fields(view)
+
+
+class TowerOrderingFilter(OrderingFilter):
+    def get_schema_fields(self, view):
+        if view.action not in ["list"]:
+            return []
+        return super().get_schema_fields(view)
 
 
 class AccountFilter(filters.FilterSet):
-    min_rep = filters.NumberFilter(field_name="reputation", lookup_expr='gte')
+    min_rep = filters.NumberFilter(
+        field_name="reputation",
+        lookup_expr="gte",
+        label="Minimum reputation"
+    )
     max_rep = filters.NumberFilter(field_name="reputation", lookup_expr='lte')
 
     min_vote_weight = filters.NumberFilter(field_name="vote_weight",
@@ -42,7 +62,5 @@ class AccountFilter(filters.FilterSet):
         fields = '__all__'
 
 
-
 class PostFilter(filters.FilterSet):
     pass
-
