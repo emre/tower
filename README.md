@@ -15,7 +15,7 @@ $ pip install -r requirements.txt
 # Configuration
 
 ```
-$ vim tower-env/tower/local_settings.py
+$ vim tower/local_settings.py
 ```
 
 Add database information of your Hivemind:
