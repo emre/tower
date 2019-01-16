@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import viewsets
+from rest_framework.response import Response
 
 from .filters import AccountFilter, TowerFilterBackend, TowerOrderingFilter
 from .models import Account, Block, Post, PostCache
@@ -8,6 +9,8 @@ from .pagination import TowerLimitedPagination
 from .serializers import (
     AccountSerializer, BlockSerializer, PostCacheSerializer,
     PostSerializer)
+from django.http import Http404
+
 
 
 class AccountViewSet(viewsets.ReadOnlyModelViewSet):
@@ -53,11 +56,36 @@ class BlockViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    retrieve:
+    Return the post_cache object by id.
+
+    list:
+    Return a list of all blocks in the blockchain.
+    """
     queryset = PostCache.objects.all()
     serializer_class = PostCacheSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('author', 'permlink')
     pagination_class = TowerLimitedPagination
+    lookup_fields = ('author', 'permlink')
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            try:
+                pk = int(kwargs.get("pk"))
+                post_cache = PostCache.objects.get(pk=pk)
+            except ValueError as e:
+                # fallback to {uuid}
+                post_cache = PostCache.objects.get(
+                    author=kwargs.get("pk"),
+                    permlink=self.request.query_params.get("permlink"),
+                )
+        except PostCache.DoesNotExist:
+            raise Http404
+
+        return Response(PostCacheSerializer(post_cache).data)
+
 
 
 class PostViewSet(viewsets.ReadOnlyModelViewSet):
@@ -65,3 +93,23 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PostSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('category', 'author', 'is_deleted')
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            try:
+                pk = int(kwargs.get("pk"))
+                post = Post.objects.get(pk=pk)
+            except ValueError as e:
+                # fallback to {uuid}
+                post = Post.objects.get(
+                    author=kwargs.get("pk"),
+                    permlink=self.request.query_params.get("permlink"),
+                )
+        except PostCache.DoesNotExist:
+            raise Http404
+
+        return Response(Post(post).data)
+
+
+
+
