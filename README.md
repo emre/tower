@@ -31,6 +31,7 @@ DATABASES = {
         'PORT': 'port',
     }
 }
+
 ```
 
 # Running
@@ -46,3 +47,43 @@ For production:
 ```
 $ gunicorn tower.wsgi
 ```
+
+# Static files and Nginx
+
+Add a STATIC_ROOT to serve the static files.
+
+```
+STATIC_ROOT = "/var/www/tower"
+```
+
+Run collectstatic command
+
+```
+$ python manage.py collectstatic
+```
+
+Serve the app and static files with nginx: (Example config)
+
+```
+server {
+  server_name tower.emrebeyler.me;
+  location / {
+    include proxy_params;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    # we don't want nginx trying to do something clever with
+    # redirects, we set the Host: header above already.
+    proxy_redirect off;
+    #proxy_set_header Host $host;
+    proxy_pass http://0.0.0.0:8000;
+  }
+    location /static {
+        autoindex on;
+        alias /var/www/tower/static;
+    }
+
+}
+
+```
+
+
