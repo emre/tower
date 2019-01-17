@@ -50,7 +50,7 @@ $ gunicorn tower.wsgi
 
 # Static files and Nginx
 
-Add a STATIC_ROOT to serve the static files.
+Add a STATIC_ROOT variable to your `local_settings.py` to serve the static files.
 
 ```
 STATIC_ROOT = "/var/www/tower"
@@ -85,5 +85,6 @@ server {
 }
 
 ```
+
 
 
