@@ -56,6 +56,8 @@ Add a STATIC_ROOT variable to your `local_settings.py` to serve the static files
 STATIC_ROOT = "/var/www/tower"
 ```
 
+Note: Path should be created manually.
+
 Run collectstatic command
 
 ```
