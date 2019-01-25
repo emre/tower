@@ -25,6 +25,7 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     lookup_field = 'name'
+    lookup_value_regex = '[^/]+'
     filter_backends = (TowerFilterBackend, TowerOrderingFilter)
     ordering_fields = (
         'vote_weight',
