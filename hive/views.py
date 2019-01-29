@@ -2,13 +2,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .filters import AccountFilter, TowerFilterBackend, TowerOrderingFilter
-from .models import Account, Block, Post, PostCache
+from .models import Account, Block, Post, PostCache, State
 from .pagination import TowerLimitedPagination
 from .serializers import (
     AccountSerializer, BlockSerializer, PostCacheSerializer,
-    PostSerializer)
+    PostSerializer, HiveStateSerializer)
 from django.http import Http404
 
 
@@ -112,5 +113,11 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(Post(post).data)
 
 
-
-
+class StateView(APIView):
+    """
+    Return the current HEAD block processed by Tower/Hivemind.
+    """
+    def get(self, request, format=None):
+        state = State.objects.last()
+        serializer = HiveStateSerializer(state)
+        return Response(serializer.data)
