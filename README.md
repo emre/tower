@@ -2,7 +2,7 @@
 
 A REST api implementation on the top of Hivemind
 
-# Installation
+# Installation (Manual)
 
 ```
 $ git clone https://github.com/emre/tower.git
@@ -88,5 +88,17 @@ server {
 
 ```
 
+# Docker installation
 
+```
+$ git clone https://github.com/emre/tower.git
+$ vim docker/local_settings.py
+$ docker build -t tower .
+$docker run -d -p 8003:8000 tower
+20fc6576d4e7992bd187299f614f39581f656db3550248b1d202666de3afa157
+$ docker logs 20fc6576d4e7992bd187299f614f39581f656db3550248b1d202666de3afa157
+[uWSGI] getting INI configuration from /app/docker/uwsgi.ini
+[uwsgi-static] added check for /app/static-files
+```
 
+It's now, accessible at :8003.
