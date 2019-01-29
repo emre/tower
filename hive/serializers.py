@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Account, Block, Post, PostCache
+from .models import Account, Block, Post, PostCache, State
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -35,4 +35,10 @@ class PostCacheSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostCache
+        fields = ('__all__')
+
+
+class HiveStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
         fields = ('__all__')
