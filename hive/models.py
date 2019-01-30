@@ -1,5 +1,7 @@
 from django.db import models
 
+from .constants import FOLLOW_STATE_FOLLOWING, FOLLOW_STATE_MUTE
+
 
 class Account(models.Model):
     name = models.CharField(unique=True, max_length=16)
@@ -27,6 +29,43 @@ class Account(models.Model):
         managed = False
         db_table = 'hive_accounts'
         ordering = ['-pk']
+
+    @property
+    def follower_list(self):
+        follower_ids = Follow.objects.filter(
+            following=self.id, state=FOLLOW_STATE_FOLLOWING).values_list(
+            'follower', flat=True)
+        follower_names = Account.objects.filter(
+            id__in=follower_ids).values_list('name', flat=True)
+        return follower_names
+
+    @property
+    def following_list(self):
+        following_ids = Follow.objects.filter(
+            follower=self.id, state=FOLLOW_STATE_FOLLOWING).values_list(
+            'following', flat=True)
+        following_names = Account.objects.filter(
+            id__in=following_ids).values_list('name', flat=True)
+        return following_names
+
+    @property
+    def muter_list(self):
+        muter_ids = Follow.objects.filter(
+            following=self.id, state=FOLLOW_STATE_MUTE).values_list(
+            'follower', flat=True)
+        muter_names = Account.objects.filter(
+            id__in=muter_ids).values_list('name', flat=True)
+        return muter_names
+
+    @property
+    def muted_list(self):
+        muted_ids = Follow.objects.filter(
+            follower=self.id, state=FOLLOW_STATE_MUTE).values_list(
+            'following', flat=True)
+        muted_names = Account.objects.filter(
+            id__in=muted_ids).values_list('name', flat=True)
+        return muted_names
+
 
 
 class Block(models.Model):
