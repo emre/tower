@@ -1,6 +1,8 @@
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,9 +11,10 @@ from .models import Account, Block, Post, PostCache, State
 from .pagination import TowerLimitedPagination
 from .serializers import (
     AccountSerializer, BlockSerializer, PostCacheSerializer,
-    PostSerializer, HiveStateSerializer)
-from django.http import Http404
-
+    PostSerializer, HiveStateSerializer,
+    AccountFollowerSerializer, AccountFollowingSerializer,
+    AccountMuterSerializer, AccountMutingSerializer
+)
 
 
 class AccountViewSet(viewsets.ReadOnlyModelViewSet):
@@ -41,6 +44,37 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('location', 'name', 'reputation')
     filterset_class = AccountFilter
 
+    @action(detail=True, methods=["get"])
+    def followers(self, *args, **kwargs):
+        """
+        Returns the related account's active followers.
+        """
+        serializer = AccountFollowerSerializer(self.get_object())
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def following(self, *args, **kwargs):
+        """
+        Returns the related account's active followings.
+        """
+        serializer = AccountFollowingSerializer(self.get_object())
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def muters(self, *args, **kwargs):
+        """
+        Returns the related account's active muters
+        """
+        serializer = AccountMuterSerializer(self.get_object())
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def muting(self, *args, **kwargs):
+        """
+        Returns the related account's active mutings.
+        """
+        serializer = AccountMutingSerializer(self.get_object())
+        return Response(serializer.data)
 
 
 class BlockViewSet(viewsets.ReadOnlyModelViewSet):
@@ -89,7 +123,6 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(PostCacheSerializer(post_cache).data)
 
 
-
 class PostViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -117,6 +150,7 @@ class StateView(APIView):
     """
     Return the current HEAD block processed by Tower/Hivemind.
     """
+
     def get(self, request, format=None):
         state = State.objects.last()
         serializer = HiveStateSerializer(state)

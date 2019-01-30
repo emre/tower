@@ -42,3 +42,47 @@ class HiveStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = State
         fields = ('__all__')
+
+
+class AccountFollowerSerializer(serializers.ModelSerializer):
+    followers = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Account
+        fields = ['followers']
+
+    def get_followers(self, obj):
+        return obj.follower_list
+
+
+class AccountFollowingSerializer(serializers.ModelSerializer):
+    following = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Account
+        fields = ['following']
+
+    def get_following(self, obj):
+        return obj.following_list
+
+
+class AccountMuterSerializer(serializers.ModelSerializer):
+    muters = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Account
+        fields = ['muters']
+
+    def get_muters(self, obj):
+        return obj.muter_list
+
+
+class AccountMutingSerializer(serializers.ModelSerializer):
+    muting = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Account
+        fields = ['muting']
+
+    def get_muting(self, obj):
+        return obj.muted_list
