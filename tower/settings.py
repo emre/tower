@@ -136,7 +136,12 @@ REST_FRAMEWORK = {
 
 STATIC_ROOT = "/app/static-files/static/"
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 try:
     from .local_settings import *
 except ImportError as e:
     pass
+
+
