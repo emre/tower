@@ -10,6 +10,5 @@ RUN pip install -r requirements.txt
 RUN pip install uwsgi
 RUN mkdir -p /app/static-files/static
 COPY . /app
-RUN mv /app/docker/local_settings.py /app/docker/tower
 RUN python manage.py collectstatic --no-input
 ENTRYPOINT ["uwsgi", "--ini", "/app/docker/uwsgi.ini"]
