@@ -4,16 +4,23 @@ A REST api implementation on the top of Hivemind
 
 # Installation (Via docker)
 
+1. Using the docker image
+
+```
+$ docker run -p 8090:8000 -e DB_PASS='hive' \
+	-e DB_USER='hivemind_db_user' \
+	-e DB_NAME='hivemind_db_name' \
+	-e DB_PORT='5432' \
+	-e DB_HOST='<hivemind_database_api>' \
+	emrebeyler/tower:stable
+```
+
+2. Building by repository
+
 Clone the repository:
 
 ```
 $ git clone https://github.com/emre/tower.git
-```
-
-Edit the database configuration
-
-```
-$ vim docker/local_settings.py
 ```
 
 Build the Docker container:
@@ -25,18 +32,22 @@ $ docker build -t tower .
 Run the container
 
 ```
-$ docker run -d -p 8090:8000 tower
+$ docker run -p 8090:8000 -e DB_PASS='hive' \
+	-e DB_USER='hivemind_db_user' \
+	-e DB_NAME='hivemind_db_name' \
+	-e DB_PORT='5432' \
+	-e DB_HOST='<hivemind_database_api>' \
+	tower
 ```
 
-Check the logs
+For troubleshooting, you may enable the debug mode with `DEBUG=1`. To 
+check logs:
 
 ```
 $ docker logs <container_id>
 [uWSGI] getting INI configuration from /app/docker/uwsgi.ini
 [uwsgi-static] added check for /app/static-files
 ```
-
-It's now, accessible at :8090.
 
 
 # Installation (Manual)
@@ -83,44 +94,4 @@ For production:
 
 ```
 $ gunicorn tower.wsgi
-```
-
-# Static files and Nginx
-
-Add a STATIC_ROOT variable to your `local_settings.py` to serve the static files.
-
-```
-STATIC_ROOT = "/var/www/tower/static"
-```
-
-Note: Path should be created manually.
-
-Run collectstatic command
-
-```
-$ python manage.py collectstatic
-```
-
-Serve the app and static files with nginx: (Example config)
-
-```
-server {
-  server_name tower.emrebeyler.me;
-  location / {
-    include proxy_params;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    # we don't want nginx trying to do something clever with
-    # redirects, we set the Host: header above already.
-    proxy_redirect off;
-    #proxy_set_header Host $host;
-    proxy_pass http://0.0.0.0:8000;
-  }
-    location /static {
-        autoindex on;
-        alias /var/www/tower/static;
-    }
-
-}
-
 ```
