@@ -104,18 +104,17 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('author', 'permlink')
     pagination_class = TowerLimitedPagination
-    lookup_fields = ('author', 'permlink')
 
     def retrieve(self, request, *args, **kwargs):
         try:
             try:
-                pk = int(kwargs.get("pk"))
-                post_cache = PostCache.objects.get(pk=pk)
-            except ValueError as e:
-                # fallback to {uuid}
                 post_cache = PostCache.objects.get(
-                    author=kwargs.get("pk"),
-                    permlink=self.request.query_params.get("permlink"),
+                    author=kwargs["author"],
+                    permlink=kwargs["permlink"],
+                )
+            except KeyError as e:
+                post_cache = PostCache.objects.get(
+                    pk=kwargs.get("pk"),
                 )
         except PostCache.DoesNotExist:
             raise Http404
