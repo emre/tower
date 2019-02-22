@@ -105,7 +105,7 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('author', 'permlink')
     pagination_class = TowerLimitedPagination
 
-    def retrieve(self, request, *args, **kwargs):
+    def _get_by_author_permlink(self, **kwargs):
         try:
             try:
                 post_cache = PostCache.objects.get(
@@ -117,9 +117,32 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
                     pk=kwargs.get("pk"),
                 )
         except PostCache.DoesNotExist:
-            raise Http404
+            return None
 
+        return post_cache
+
+    def retrieve(self, request, *args, **kwargs):
+        post_cache = self._get_by_author_permlink(**kwargs)
         return Response(PostCacheSerializer(post_cache).data)
+
+
+    @action(detail=True, methods=["get"])
+    def votes(self, *args, **kwargs):
+        """Returns the vote(r) information of the post.
+        """
+        response = []
+        obj = self._get_by_author_permlink(**kwargs)
+        if not obj.votes:
+            return response
+        votes = obj.votes.split("\n")
+        for row in votes:
+            # ignore the reputation
+            # https://github.com/steemit/hivemind/issues/175
+            voter, rshares, percent, _ = row.split(",")
+            response.append(
+                {"voter": voter, "rshares": rshares, "percent": percent})
+        return Response(response)
+
 
 
 class PostViewSet(viewsets.ReadOnlyModelViewSet):

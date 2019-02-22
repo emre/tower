@@ -8,16 +8,33 @@ from hive.views import PostCacheViewSet
 from rest_framework.documentation import include_docs_urls
 
 post_cache_detail = PostCacheViewSet.as_view({
-    'get': 'retrieve'
+    'get': 'retrieve',
 })
+
+post_cache_list = PostCacheViewSet.as_view({
+    'get': 'list',
+})
+
+post_cache_detail_votes = PostCacheViewSet.as_view({
+    'get': 'votes',
+})
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
     path('api/v1/state/', StateView.as_view(), name="state"),
     path(
+        'api/v1/post_c  ache/',
+        post_cache_list,
+        name="post-cache-list"),
+    path(
         'api/v1/post_cache/<str:author>/<str:permlink>/',
-        post_cache_detail,
+        post_cache_detail,\
         name="post-cache-detail"),
+    path(
+        'api/v1/post_cache/<str:author>/<str:permlink>/votes/',
+        post_cache_detail_votes,
+        name="post-cache-detail-votes"),
     path('', include_docs_urls(title='Tower API')),
 ]
