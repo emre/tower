@@ -7,13 +7,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import AccountFilter, TowerFilterBackend, TowerOrderingFilter
-from .models import Account, Block, Post, PostCache, State
+from .models import Account, Block, Post, PostCache, State, Reblog
 from .pagination import TowerLimitedPagination
 from .serializers import (
     AccountSerializer, BlockSerializer, PostCacheSerializer,
     PostSerializer, HiveStateSerializer,
     AccountFollowerSerializer, AccountFollowingSerializer,
-    AccountMuterSerializer, AccountMutingSerializer
+    AccountMuterSerializer, AccountMutingSerializer,
 )
 
 
@@ -143,6 +143,17 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
                 {"voter": voter, "rshares": rshares, "percent": percent})
         return Response(response)
 
+    @action(detail=True, methods=["get"])
+    def reblogs(self, *args, **kwargs):
+        """Returns the rebloggers of the post.
+        """
+        obj = self._get_by_author_permlink(**kwargs)
+        reblogs = Reblog.objects.filter(post=obj.post).order_by("-created_at").values_list(
+            'account', 'created_at')
+        return Response([{
+            "author": reblog[0],
+            "resteemed_at": reblog[1],
+        } for reblog in reblogs])
 
 
 class PostViewSet(viewsets.ReadOnlyModelViewSet):
