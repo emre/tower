@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('api/v1/state/', StateView.as_view(), name="state"),
     path(
-        'api/v1/post_c  ache/',
+        'api/v1/post_cache/',
         post_cache_list,
         name="post-cache-list"),
     path(
