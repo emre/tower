@@ -169,7 +169,7 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
             'account', 'created_at')
         return Response([{
             "author": reblog[0],
-            "resteemed_at": reblog[1],
+            "reblogged_at": reblog[1],
         } for reblog in reblogs])
 
     @action(detail=False, methods=["get", ])
