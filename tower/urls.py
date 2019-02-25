@@ -65,5 +65,9 @@ urlpatterns = [
         'api/v1/post_cache/<str:author>/<str:permlink>/reblogs/',
         post_cache_detail_reblogs,
         name="post-cache-detail-reblogs"),
+    path(
+        'api/v1/post_cache/<str:author>/<str:permlink>/votes/',
+        post_cache_detail_votes,
+        name="post-cache-detail-votes"),
     path('', include_docs_urls(title='Tower API')),
 ]
