@@ -19,6 +19,11 @@ post_cache_detail_votes = PostCacheViewSet.as_view({
     'get': 'votes',
 })
 
+post_cache_detail_reblogs = PostCacheViewSet.as_view({
+    'get': 'reblogs',
+})
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,11 +35,15 @@ urlpatterns = [
         name="post-cache-list"),
     path(
         'api/v1/post_cache/<str:author>/<str:permlink>/',
-        post_cache_detail,\
+        post_cache_detail,
         name="post-cache-detail"),
     path(
         'api/v1/post_cache/<str:author>/<str:permlink>/votes/',
         post_cache_detail_votes,
         name="post-cache-detail-votes"),
+    path(
+        'api/v1/post_cache/<str:author>/<str:permlink>/reblogs/',
+        post_cache_detail_reblogs,
+        name="post-cache-detail-reblogs"),
     path('', include_docs_urls(title='Tower API')),
 ]

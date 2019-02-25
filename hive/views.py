@@ -7,13 +7,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import AccountFilter, TowerFilterBackend, TowerOrderingFilter
-from .models import Account, Block, Post, PostCache, State
+from .models import Account, Block, Post, PostCache, State, Reblog
 from .pagination import TowerLimitedPagination
 from .serializers import (
     AccountSerializer, BlockSerializer, PostCacheSerializer,
     PostSerializer, HiveStateSerializer,
     AccountFollowerSerializer, AccountFollowingSerializer,
-    AccountMuterSerializer, AccountMutingSerializer
+    AccountMuterSerializer, AccountMutingSerializer,
+    ReblogSerializer
 )
 
 
@@ -76,6 +77,19 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = AccountMutingSerializer(self.get_object())
         return Response(serializer.data)
 
+    @action(detail=True, methods=["get"])
+    def reblogs(self, *args, **kwargs):
+        """
+        Returns the reblogs of the user.
+        """
+        obj = self.get_object()
+        reblogs = Reblog.objects.filter(account=obj.name).order_by(
+            "-created_at").values(
+            'post__author', 'post__permlink', 'created_at')
+        page = self.paginate_queryset(reblogs)
+        if page is not None:
+            serializer = ReblogSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
 class BlockViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -143,6 +157,17 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
                 {"voter": voter, "rshares": rshares, "percent": percent})
         return Response(response)
 
+    @action(detail=True, methods=["get"])
+    def reblogs(self, *args, **kwargs):
+        """Returns the rebloggers of the post.
+        """
+        obj = self._get_by_author_permlink(**kwargs)
+        reblogs = Reblog.objects.filter(post=obj.post).order_by("-created_at").values_list(
+            'account', 'created_at')
+        return Response([{
+            "author": reblog[0],
+            "resteemed_at": reblog[1],
+        } for reblog in reblogs])
 
 
 class PostViewSet(viewsets.ReadOnlyModelViewSet):

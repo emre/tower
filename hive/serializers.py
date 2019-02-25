@@ -86,3 +86,8 @@ class AccountMutingSerializer(serializers.ModelSerializer):
 
     def get_muting(self, obj):
         return obj.muted_list
+
+class ReblogSerializer(serializers.Serializer):
+    author = serializers.CharField(source='post__author')
+    permlink = serializers.CharField(source='post__permlink')
+    created_at = serializers.DateTimeField()
