@@ -137,6 +137,8 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         post_cache = self._get_by_author_permlink(**kwargs)
+        if not post_cache:
+            raise Http404
         return Response(PostCacheSerializer(post_cache).data)
 
 
@@ -176,21 +178,27 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('category', 'author', 'is_deleted')
 
-    def retrieve(self, request, *args, **kwargs):
+    def _get_by_author_permlink(self, **kwargs):
         try:
             try:
-                pk = int(kwargs.get("pk"))
-                post = Post.objects.get(pk=pk)
-            except ValueError as e:
-                # fallback to {uuid}
                 post = Post.objects.get(
-                    author=kwargs.get("pk"),
-                    permlink=self.request.query_params.get("permlink"),
+                    author=kwargs["author"],
+                    permlink=kwargs["permlink"],
+                )
+            except KeyError as e:
+                post = Post.objects.get(
+                    pk=kwargs.get("pk"),
                 )
         except PostCache.DoesNotExist:
-            raise Http404
+            return None
 
-        return Response(Post(post).data)
+        return post
+
+    def retrieve(self, request, *args, **kwargs):
+        post = self._get_by_author_permlink(**kwargs)
+        if not post:
+            raise Http404
+        return Response(PostSerializer(post).data)
 
 
 class StateView(APIView):
