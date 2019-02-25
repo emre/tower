@@ -23,6 +23,11 @@ post_cache_detail_reblogs = PostCacheViewSet.as_view({
     'get': 'reblogs',
 })
 
+post_cache_detail_filter_by_tags = PostCacheViewSet.as_view({
+    'get': 'filter_by_tags',
+})
+
+
 post_detail = PostCacheViewSet.as_view({
     'get': 'retrieve',
 })
@@ -53,9 +58,9 @@ urlpatterns = [
         post_detail,
         name="posts-detail"),
     path(
-        'api/v1/post_cache/<str:author>/<str:permlink>/votes/',
-        post_cache_detail_votes,
-        name="post-cache-detail-votes"),
+        'api/v1/post_cache/filter_by_tags/',
+        post_cache_detail_filter_by_tags,
+        name="post-cache-detail-filter-by-tags"),
     path(
         'api/v1/post_cache/<str:author>/<str:permlink>/reblogs/',
         post_cache_detail_reblogs,
