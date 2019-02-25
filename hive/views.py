@@ -14,6 +14,7 @@ from .serializers import (
     PostSerializer, HiveStateSerializer,
     AccountFollowerSerializer, AccountFollowingSerializer,
     AccountMuterSerializer, AccountMutingSerializer,
+    ReblogSerializer
 )
 
 
@@ -76,6 +77,19 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = AccountMutingSerializer(self.get_object())
         return Response(serializer.data)
 
+    @action(detail=True, methods=["get"])
+    def reblogs(self, *args, **kwargs):
+        """
+        Returns the reblogs of the user.
+        """
+        obj = self.get_object()
+        reblogs = Reblog.objects.filter(account=obj.name).order_by(
+            "-created_at").values(
+            'post__author', 'post__permlink', 'created_at')
+        page = self.paginate_queryset(reblogs)
+        if page is not None:
+            serializer = ReblogSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
 class BlockViewSet(viewsets.ReadOnlyModelViewSet):
     """
