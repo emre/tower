@@ -181,16 +181,6 @@ class Payment(models.Model):
         db_table = 'hive_payments'
 
 
-class PostTag(models.Model):
-    post_id = models.IntegerField()
-    tag = models.CharField(max_length=32)
-
-    class Meta:
-        managed = False
-        db_table = 'hive_post_tags'
-        unique_together = (('tag', 'post_id'),)
-
-
 class Post(models.Model):
     parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
     author = models.CharField(max_length=255)
@@ -210,6 +200,15 @@ class Post(models.Model):
         db_table = 'hive_posts'
         unique_together = (('author', 'permlink'),)
         ordering = ["-pk"]
+
+class PostTag(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.DO_NOTHING)
+    tag = models.CharField(max_length=32)
+
+    class Meta:
+        managed = False
+        db_table = 'hive_post_tags'
+        unique_together = (('tag', 'post'),)
 
 
 class PostCache(models.Model):
