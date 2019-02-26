@@ -180,19 +180,24 @@ class PostCacheViewSet(viewsets.ReadOnlyModelViewSet):
         exact_matches = self.request.query_params.getlist("[]exact", [])
         if not len(exact_matches):
             raise Http404
-        with connection.cursor() as cursor:
-            subqueries = []
-            for _ in exact_matches:
-                subqueries.append("SELECT post_id " \
-                           "FROM hive_post_tags " \
-                           "WHERE tag = %s")
-            subquery = " INTERSECT ".join(subqueries)
-            subquery = "(%s)" % subquery
-            cursor.execute(subquery, exact_matches)
-            post_ids = [p[0] for p in cursor.fetchall()]
+        if len(exact_matches) == 1:
+            # optimize the query if there is only one tag requested.
+            post_cache_objects = PostCache.objects.filter(
+                post__posttag__tag=exact_matches[0])
+        else:
+            with connection.cursor() as cursor:
+                subqueries = []
+                for _ in exact_matches:
+                    subqueries.append("SELECT post_id " \
+                               "FROM hive_post_tags " \
+                               "WHERE tag = %s")
+                subquery = " INTERSECT ".join(subqueries)
+                subquery = "(%s)" % subquery
+                cursor.execute(subquery, exact_matches)
+                post_ids = [p[0] for p in cursor.fetchall()]
 
-        post_cache_objects = PostCache.objects.filter(pk__in=post_ids).order_by(
-            "-created_at")
+                post_cache_objects = PostCache.objects.filter(
+                    pk__in=post_ids).order_by("-created_at")
         page = self.paginate_queryset(post_cache_objects)
         if page is not None:
             serializer = PostCacheSerializer(page, many=True)
