@@ -46,9 +46,9 @@ class AccountFilter(filters.FilterSet):
     max_active_at = filters.NumberFilter(field_name="active_at",
                                          lookup_expr='lte')
 
-    min_created_at = filters.NumberFilter(field_name="created_at",
+    min_created_at = filters.DateTimeFilter(field_name="created_at",
                                           lookup_expr='gte')
-    max_created_at = filters.NumberFilter(field_name="created_at",
+    max_created_at = filters.DateTimeFilter(field_name="created_at",
                                           lookup_expr='lte')
 
     location__contains = filters.CharFilter(field_name="location",
