@@ -24,6 +24,7 @@ SECRET_KEY = '5c&)b%g331=-1l5nhoa3b5gy8%%9030zrhm)h0z%7aou$l(7o%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") or False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -41,9 +42,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'crispy_forms',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -138,6 +141,8 @@ STATIC_ROOT = "/app/static-files/static/"
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 try:
     from .local_settings import *
